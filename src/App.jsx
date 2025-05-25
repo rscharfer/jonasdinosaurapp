@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Target, Sprout, Printer, RotateCcw, Loader2, AlertTriangle, Image as ImageIcon, Volume2, VolumeX } from 'lucide-react';
 import * as Tone from 'tone';
+import getGeneratedImage from '../utils/getGeneratedImage';
 
 const App = () => {
   const reptiles = [
@@ -70,38 +71,13 @@ const App = () => {
       losingCreatureName = creature1Name;
       winnerHabitat = dinosaurData.era; 
     }
-  console.log({creature1Name, creature2Name, winningCreatureName, losingCreatureName, winnerHabitat});  
    // const prompt = `Epic, photorealistic battle scene: a ${creature1Name} versus a ${creature2Name}. The ${winningCreatureName} is **undeniably triumphant and in a massively dominant pose**, decisively overpowering the ${losingCreatureName}. The ${winningCreatureName} is poised to deliver a **spectacular and final fight-ending blow**. The ${losingCreatureName} appears clearly defeated, weakened, and on the verge of collapse. The scene is set in a dramatic environment inspired by ${winnerHabitat}, featuring dynamic action, intense cinematic lighting, and hyper-realistic textures. Focus on the power and inevitable victory of the ${winningCreatureName}.`;
     const prompt = `Epic, photorealistic battle scene: a ${creature1Name} versus a ${creature2Name}. The ${winningCreatureName} is victorious, and staring down at the defeated ${losingCreatureName}`
     try {
-      const apiKey = 'AIzaSyCi2Pgnu5F6hQ9WPEP9o2J_xHn_gaQfs3A'; 
-      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
       
-      const payload = {
-        instances: [{ prompt: prompt }],
-        parameters: { sampleCount: 1 }
-      };
+      const result = await getGeneratedImage(prompt)
+      setGeneratedImage(`data:image/png;base64,${result.image[0]}`);
 
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('API Error:', errorData);
-        throw new Error(`Failed to generate image. Status: ${response.status}. ${errorData.error?.message || 'Unknown error'}`);
-      }
-
-      const result = await response.json();
-
-      if (result.predictions && result.predictions.length > 0 && result.predictions[0].bytesBase64Encoded) {
-        setGeneratedImage(`data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`);
-      } else {
-        console.error('Unexpected API response structure:', result);
-        throw new Error('Failed to get image data from API response.');
-      }
     } catch (err) {
       console.error(err);
       setError(err.message || 'An unexpected error occurred while generating the image.');
