@@ -34,20 +34,22 @@ app.post('/api/generate-battle-image', async (req, res) => {
       },
     });
 
-    const result = {
-      text: [],
-      image: [],
-    };
+    const result = {};
 
     for (const part of response.candidates[0].content.parts) {
-      if (part.text) {
-        result.text.push(part.text)
-      } else if (part.inlineData) {
-        const imageData = part.inlineData.data;
-        result.image.push(imageData)
-        
-      }
-  }
+        if (part.text) {
+            if (result.text) {
+                throw Error('there are multiple *text* parts in response - each subsequent one overwrites the previous')
+            }
+            result.text = part.text;
+        } else if (part.inlineData) {
+            // inlineData.data is base64-encoded string of bytes
+            if (result.imageBytes) {
+                throw Error('there are multiple *image* parts in response - each subsequent one overwrites the previous')
+            }
+            result.imageBytes = part.inlineData.data
+        }
+    }
     
    res.json(result);
 
