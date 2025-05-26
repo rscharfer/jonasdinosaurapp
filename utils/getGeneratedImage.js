@@ -1,7 +1,7 @@
 async function getGeneratedImage(prompt) {
     // takes in a prompt and makes a call to an endpoint which holds API key
 
-    const endpointWithKey = 'http://localhost:3001/api/generate-battle-image';
+    const endpointWithKey = '/.netlify/functions/getGeneratedImage';
     // perhaps this could point to a serverless function?? ^^
 
     let response;

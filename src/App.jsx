@@ -26,7 +26,6 @@ const App = () => {
   const [creature2, setSelectedDinosaur] = useState('');
   const [winner, setWinner] = useState('');
   const [loser, setLoser] = useState('');
-  const [habitat, setHabitat] = useState('');
   const [generatedImage, setGeneratedImage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -45,7 +44,7 @@ const App = () => {
     // set generated image to empty string
     setGeneratedImage('');
 
-    const prompt = `Epic, photorealistic battle scene: a ${creature1} versus a ${creature2}. The ${winner} is **undeniably triumphant and in a massively dominant pose**, decisively overpowering the ${loser}. The ${winner} is poised to deliver a **spectacular and final fight-ending blow**. The ${loser} appears clearly defeated, weakened, and on the verge of collapse. The scene is set in a dramatic environment inspired by Late Cretaceous period jungle, featuring dynamic action, intense cinematic lighting, and hyper-realistic textures. Focus on the power and inevitable victory of the ${winner}.`;
+    const prompt = `Epic, photorealistic battle scene: a ${creature1} versus a ${creature2}. The ${winner} is **undeniably triumphant and in a massively dominant pose**, decisively overpowering the ${loser}. The ${winner} is also clearly bigger than the ${loser} in physical stature. The ${winner} is poised to deliver a **spectacular and final fight-ending blow**. The ${loser} appears clearly defeated, weakened, and on the verge of collapse. The scene is set in a dramatic environment inspired by Late Cretaceous period jungle, featuring dynamic action, intense cinematic lighting, and hyper-realistic textures. Focus on the power and inevitable victory of the ${winner}.`;
     try {
       
       const result = await getGeneratedImage(prompt)

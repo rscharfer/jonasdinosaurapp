@@ -1,10 +1,11 @@
 import { GoogleGenAI, Modality } from "@google/genai";
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const ai = new GoogleGenAI({ apiKey: Netlify.env.get("GEMINI_API_KEY") });
 
-export default async (req, context) => {
+export default async (req, netlifyContext) => {
+    const body = await new Response(req.body).json();
 
-    
-    const { prompt, model = 'gemini-2.0-flash-preview-image-generation' } = req.body; // Get the prompt from the request body
+
+    const { prompt, model = 'gemini-2.0-flash-preview-image-generation' } = body; // Get the prompt from the request body
     
     if (!prompt) {
         return Response.json({error: 'Prompt is required'}, {status: 400})
