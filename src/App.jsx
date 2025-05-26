@@ -22,9 +22,11 @@ const App = () => {
     { id: 'giganotosaurus', name: 'Giganotosaurus', era: 'Late Cretaceous period forested floodplains' },
   ];
 
-  const [selectedReptile, setSelectedReptile] = useState('');
-  const [selectedDinosaur, setSelectedDinosaur] = useState('');
+  const [creature1, setSelectedReptile] = useState('');
+  const [creature2, setSelectedDinosaur] = useState('');
   const [winner, setWinner] = useState('');
+  const [loser, setLoser] = useState('');
+  const [habitat, setHabitat] = useState('');
   const [generatedImage, setGeneratedImage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -36,47 +38,19 @@ const App = () => {
 
 
   const handleBattle = async () => {
-    if (!selectedReptile || !selectedDinosaur || !winner) {
-      setModalMessage('Please select a reptile, a dinosaur, and a winner before starting the battle!');
-      setShowModal(true);
-      return;
-    }
-
-
+    // set isLoading to true
     setIsLoading(true);
+    // set error to empty string
     setError('');
+    // set generated image to empty string
     setGeneratedImage('');
 
-    const reptileData = reptiles.find(r => r.id === selectedReptile);
-    const dinosaurData = dinosaurs.find(d => d.id === selectedDinosaur);
-
-    if (!reptileData || !dinosaurData) {
-        setError('Could not find selected creature data.');
-        setIsLoading(false);
-        return;
-    }
-
-    const creature1Name = reptileData.name;
-    const creature2Name = dinosaurData.name;
-    let winningCreatureName = '';
-    let losingCreatureName = '';
-    let winnerHabitat = '';
-
-    if (winner === 'reptile') {
-      winningCreatureName = creature1Name;
-      losingCreatureName = creature2Name;
-      winnerHabitat = reptileData.habitat;
-    } else {
-      winningCreatureName = creature2Name;
-      losingCreatureName = creature1Name;
-      winnerHabitat = dinosaurData.era; 
-    }
-   // const prompt = `Epic, photorealistic battle scene: a ${creature1Name} versus a ${creature2Name}. The ${winningCreatureName} is **undeniably triumphant and in a massively dominant pose**, decisively overpowering the ${losingCreatureName}. The ${winningCreatureName} is poised to deliver a **spectacular and final fight-ending blow**. The ${losingCreatureName} appears clearly defeated, weakened, and on the verge of collapse. The scene is set in a dramatic environment inspired by ${winnerHabitat}, featuring dynamic action, intense cinematic lighting, and hyper-realistic textures. Focus on the power and inevitable victory of the ${winningCreatureName}.`;
-    const prompt = `Epic, photorealistic battle scene: a ${creature1Name} versus a ${creature2Name}. The ${winningCreatureName} is victorious, and staring down at the defeated ${losingCreatureName}`
+    const prompt = `Epic, photorealistic battle scene: a ${creature1} versus a ${creature2}. The ${winner} is **undeniably triumphant and in a massively dominant pose**, decisively overpowering the ${loser}. The ${winner} is poised to deliver a **spectacular and final fight-ending blow**. The ${loser} appears clearly defeated, weakened, and on the verge of collapse. The scene is set in a dramatic environment inspired by Late Cretaceous period jungle, featuring dynamic action, intense cinematic lighting, and hyper-realistic textures. Focus on the power and inevitable victory of the ${winner}.`;
     try {
       
       const result = await getGeneratedImage(prompt)
-      setGeneratedImage(`data:image/png;base64,${result.image[0]}`);
+      // use data urls can make use of raw image bytes to create image on page
+      setGeneratedImage(`data:image/png;base64,${result.imageBytes}`);
 
     } catch (err) {
       console.error(err);
@@ -116,6 +90,7 @@ const App = () => {
     setSelectedReptile('');
     setSelectedDinosaur('');
     setWinner('');
+    setLoser('');
     setGeneratedImage('');
     setError('');
     setIsLoading(false);
@@ -157,12 +132,12 @@ const App = () => {
   );
   
   const winnerOptions = [];
-  if (selectedReptile) {
-    const reptileData = reptiles.find(r => r.id === selectedReptile);
+  if (creature1) {
+    const reptileData = reptiles.find(r => r.id === creature1);
     if (reptileData) winnerOptions.push({ value: 'reptile', label: reptileData.name });
   }
-  if (selectedDinosaur) {
-    const dinosaurData = dinosaurs.find(d => d.id === selectedDinosaur);
+  if (creature2) {
+    const dinosaurData = dinosaurs.find(d => d.id === creature2);
     if (dinosaurData) winnerOptions.push({ value: 'dinosaur', label: dinosaurData.name });
   }
 
@@ -205,7 +180,7 @@ const App = () => {
         <div className="space-y-6 mb-8">
           <CustomSelect
             id="reptile-select"
-            value={selectedReptile}
+            value={creature1}
             onChange={(e) => setSelectedReptile(e.target.value)}
             options={reptiles.map(r => ({ value: r.id, label: r.name }))}
             placeholder="-- Select a Deadly Reptile --"
@@ -213,7 +188,7 @@ const App = () => {
           />
           <CustomSelect
             id="dinosaur-select"
-            value={selectedDinosaur}
+            value={creature2}
             onChange={(e) => setSelectedDinosaur(e.target.value)}
             options={dinosaurs.map(d => ({ value: d.id, label: d.name }))}
             placeholder="-- Select a Carnivorous Dinosaur --"
@@ -222,17 +197,25 @@ const App = () => {
           <CustomSelect
             id="winner-select"
             value={winner}
-            onChange={(e) => setWinner(e.target.value)}
+            onChange={(e) => {
+              setWinner(e.target.value)
+              if (e.target.value === creature1) {
+                setLoser(creature2)
+              } else {
+                setLoser(creature1)
+              }
+            
+            }}
             options={winnerOptions}
             placeholder="-- Who Will Win? --"
             icon={<ImageIcon className="w-5 h-5 text-yellow-500" />} 
-            disabled={!selectedReptile || !selectedDinosaur}
+            disabled={!creature1 || !creature2}
           />
         </div>
 
         <button
           onClick={handleBattle}
-          disabled={isLoading || !selectedReptile || !selectedDinosaur || !winner}
+          disabled={isLoading || !creature1 || !creature2 || !winner}
           className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-6 rounded-lg text-xl shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 flex items-center justify-center disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75"
         >
           {isLoading ? (
