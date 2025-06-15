@@ -157,7 +157,7 @@ const App = () => {
     </div>
   );
 
-
+  console.log('howdee')
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-500 via-yellow-400 to-orange-500 p-4 sm:p-6 flex flex-col items-center font-['Comic Sans MS', 'Chalkboard SE', 'casual']">
       {showModal && <Modal message={modalMessage} onClose={() => setShowModal(false)} />}
